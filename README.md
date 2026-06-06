@@ -24,6 +24,7 @@ A Windows desktop app for batch renaming files with live preview, undo support, 
 - **Drag and drop**: drop a folder into the app to load it.
 - **Multilingual UI**: English and Vietnamese.
 - **Update check**: checks public GitHub Releases for newer versions.
+- **Windows installer**: `FileRenamer-Setup.exe` installs the app for the current user, creates Desktop/Start Menu shortcuts, and adds `Uninstall FileRenamer.exe`.
 
 ### Run From Source
 
@@ -37,17 +38,36 @@ pip install -r requirements.txt
 python main.py
 ```
 
-### Build Executable
+### Build Executable and Installer
 
 ```powershell
 pip install -r requirements.txt
 pyinstaller build.spec --clean -y
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\installer\build-installer.ps1
 ```
 
 The packaged app is created at:
 
 ```text
 dist/FileRenamer/FileRenamer.exe
+```
+
+The installer is created at:
+
+```text
+dist/FileRenamer-Setup.exe
+```
+
+When installed, FileRenamer is copied to:
+
+```text
+%LOCALAPPDATA%\Programs\FileRenamer
+```
+
+The installer creates Desktop and Start Menu shortcuts, writes a per-user uninstall entry to Windows Installed Apps, and places the uninstaller at:
+
+```text
+%LOCALAPPDATA%\Programs\FileRenamer\Uninstall FileRenamer.exe
 ```
 
 ### Update Releases
@@ -62,8 +82,10 @@ Before publishing a new release:
 
 1. Update `APP_VERSION` in `app/app_info.py`.
 2. Rebuild with PyInstaller.
-3. Push the updated app files to the public release repository.
-4. Create a GitHub Release with a tag newer than the app version users already have, for example `v0.1.8`.
+3. Rebuild the installer with `installer/build-installer.ps1`.
+4. Push the updated app files and installer to the public release repository.
+5. Create a GitHub Release with a tag newer than the app version users already have, for example `v0.1.8`.
+6. Attach `dist/FileRenamer-Setup.exe` to the GitHub Release so users can install the latest version.
 
 ### Project Structure
 
@@ -75,6 +97,8 @@ app/
   ui/                      PySide6 windows, widgets, and tabs
 assets/                    App icons and images
 dist/FileRenamer/          Packaged Windows app
+dist/FileRenamer-Setup.exe Windows installer artifact
+installer/                 Installer build script and C# installer stub
 main.py                    App entry point
 build.spec                 PyInstaller configuration
 requirements.txt           Runtime/build dependencies
@@ -85,6 +109,7 @@ requirements.txt           Runtime/build dependencies
 - UI: PySide6
 - Video metadata: pymediainfo
 - Packaging: PyInstaller
+- Installer: C#/.NET Framework self-extracting installer
 - Updates: GitHub Releases API
 
 ---
@@ -105,6 +130,7 @@ requirements.txt           Runtime/build dependencies
 - **Kéo thả thư mục**: kéo một thư mục vào app để tải danh sách file.
 - **Giao diện song ngữ**: tiếng Anh và tiếng Việt.
 - **Kiểm tra cập nhật**: kiểm tra bản mới qua GitHub Releases public.
+- **Installer Windows**: `FileRenamer-Setup.exe` cài app cho user hiện tại, tạo shortcut Desktop/Start Menu và thêm `Uninstall FileRenamer.exe`.
 
 ### Chạy từ source
 
@@ -118,17 +144,36 @@ pip install -r requirements.txt
 python main.py
 ```
 
-### Build file chạy
+### Build file chạy và installer
 
 ```powershell
 pip install -r requirements.txt
 pyinstaller build.spec --clean -y
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\installer\build-installer.ps1
 ```
 
 Ứng dụng đã đóng gói nằm tại:
 
 ```text
 dist/FileRenamer/FileRenamer.exe
+```
+
+Installer được tạo tại:
+
+```text
+dist/FileRenamer-Setup.exe
+```
+
+Sau khi cài đặt, FileRenamer được copy vào:
+
+```text
+%LOCALAPPDATA%\Programs\FileRenamer
+```
+
+Installer tạo shortcut ở Desktop và Start Menu, đăng ký mục gỡ cài đặt theo user trong Windows Installed Apps, và đặt file uninstall tại:
+
+```text
+%LOCALAPPDATA%\Programs\FileRenamer\Uninstall FileRenamer.exe
 ```
 
 ### Cập nhật phiên bản
@@ -143,8 +188,10 @@ Trước khi phát hành bản mới:
 
 1. Cập nhật `APP_VERSION` trong `app/app_info.py`.
 2. Build lại bằng PyInstaller.
-3. Push các file app đã cập nhật lên repo release public.
-4. Tạo GitHub Release với tag mới hơn bản người dùng đang có, ví dụ `v0.1.8`.
+3. Build lại installer bằng `installer/build-installer.ps1`.
+4. Push các file app và installer đã cập nhật lên repo release public.
+5. Tạo GitHub Release với tag mới hơn bản người dùng đang có, ví dụ `v0.1.8`.
+6. Đính kèm `dist/FileRenamer-Setup.exe` vào GitHub Release để người dùng cài bản mới nhất.
 
 ### Cấu trúc project
 
@@ -156,6 +203,8 @@ app/
   ui/                      Cửa sổ, widget và tab PySide6
 assets/                    Icon và hình ảnh của app
 dist/FileRenamer/          Bản app Windows đã đóng gói
+dist/FileRenamer-Setup.exe File installer Windows
+installer/                 Script build installer và C# installer stub
 main.py                    Entry point của app
 build.spec                 Cấu hình PyInstaller
 requirements.txt           Dependency chạy/build app
@@ -166,4 +215,5 @@ requirements.txt           Dependency chạy/build app
 - UI: PySide6
 - Metadata video: pymediainfo
 - Đóng gói: PyInstaller
+- Installer: C#/.NET Framework self-extracting installer
 - Cập nhật: GitHub Releases API
