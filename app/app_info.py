@@ -1,0 +1,5 @@
+"""Application metadata and constants."""
+APP_VERSION = "0.1.7"
+GITHUB_OWNER = "pduc1234"
+GITHUB_REPO = "pyRenameRelease"
+GITHUB_URL = f"https://github.com/{GITHUB_OWNER}/{GITHUB_REPO}"
