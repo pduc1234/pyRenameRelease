@@ -2,7 +2,7 @@
 from PySide6.QtWidgets import (
     QWidget, QHBoxLayout, QLabel, QLineEdit, QPushButton, QComboBox, QFileDialog
 )
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Qt, Signal
 
 
 class TopBar(QWidget):
@@ -46,6 +46,7 @@ class TopBar(QWidget):
         # Update button (hidden by default)
         self.update_btn = QPushButton("🚀 Update")
         self.update_btn.setVisible(False)
+        self.update_btn.setCursor(Qt.PointingHandCursor)
         self.update_btn.setStyleSheet("background-color: #1D9E75; color: white; font-weight: bold;")
         self.update_btn.clicked.connect(self.update_requested.emit)
         layout.addWidget(self.update_btn)

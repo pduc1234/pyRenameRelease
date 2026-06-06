@@ -136,6 +136,7 @@ class MainWindow(QMainWindow):
         self.top_bar.folder_changed.connect(self._on_folder_changed)
         self.top_bar.refresh_requested.connect(self._on_refresh)
         self.top_bar.language_changed.connect(self._on_language_changed)
+        self.top_bar.update_requested.connect(self._on_update_requested)
 
         # Sidebar
         self.sidebar.filter_changed.connect(self._on_filter_changed)
