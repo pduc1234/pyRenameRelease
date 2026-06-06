@@ -1,6 +1,6 @@
 # File Renamer / Trình Đổi Tên File
 
-Version: `0.1.7`
+Version: `0.1.8`
 
 A Windows desktop app for batch renaming files with live preview, undo support, video resolution naming, and update checks through GitHub Releases.
 
