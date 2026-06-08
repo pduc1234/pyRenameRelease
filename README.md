@@ -1,6 +1,6 @@
 # File Renamer / Trinh Doi Ten File
 
-Version: `0.2.4`
+Version: `0.2.5`
 
 File Renamer is a Windows desktop app for safely renaming many files at once. It supports live preview, undo, video-resolution naming, bilingual UI, a Windows installer, and GitHub Releases based update checks.
 
@@ -125,12 +125,12 @@ Example `latest.json`:
 
 ```json
 {
-  "version": "0.2.4",
+  "version": "0.2.5",
   "published_at": "2026-06-08T00:00:00Z",
-  "package_url": "https://github.com/pduc1234/pyRenameRelease/releases/download/v0.2.4/FileRenamer-Setup.exe",
+  "package_url": "https://github.com/pduc1234/pyRenameRelease/releases/download/v0.2.5/FileRenamer-Setup.exe",
   "sha256": "<sha256 of FileRenamer-Setup.exe>",
   "signature_algorithm": "ed25519",
-  "notes_url": "https://github.com/pduc1234/pyRenameRelease/releases/tag/v0.2.4"
+  "notes_url": "https://github.com/pduc1234/pyRenameRelease/releases/tag/v0.2.5"
 }
 ```
 
@@ -162,13 +162,13 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\installer\build-instal
 ```powershell
 git add README.md app/app_info.py app tests installer build.spec requirements.txt
 git add -f dist/FileRenamer dist/FileRenamer-Setup.exe
-git commit -m "v0.2.4: release build"
-git tag v0.2.4
+git commit -m "v0.2.5: release build"
+git tag v0.2.5
 git push origin main
-git push origin v0.2.4
+git push origin v0.2.5
 ```
 
-6. Create a GitHub Release from tag `v0.2.4`.
+6. Create a GitHub Release from tag `v0.2.5`.
 7. Attach `dist/FileRenamer-Setup.exe`.
 8. Optional but recommended: attach signed `latest.json` and `latest.json.sig`.
 
