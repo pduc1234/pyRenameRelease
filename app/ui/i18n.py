@@ -8,19 +8,28 @@ from typing import Dict, Any
 def resource_path(relative_path: str) -> Path:
     """Get absolute path to resource, works for dev and for PyInstaller."""
     if hasattr(sys, "_MEIPASS"):
-        return Path(sys._MEIPASS) / relative_path
+        base_path = Path(sys._MEIPASS)
+        candidates = [
+            base_path / relative_path,
+            base_path / "app" / relative_path,
+        ]
+        for candidate in candidates:
+            if candidate.exists():
+                return candidate
+        return candidates[0]
     
     # Path to project root (one level above app/)
     base_path = Path(__file__).resolve().parent.parent.parent
     
-    # Try project root
-    p = base_path / relative_path
-    if p.exists():
-        return p
-        
-    # Try inside app/ folder (common for i18n in dev)
-    p = base_path / "app" / relative_path
-    return p
+    candidates = [
+        base_path / relative_path,
+        base_path / "app" / relative_path,
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+
+    return candidates[0]
 
 
 class I18nManager:

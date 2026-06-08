@@ -8,7 +8,7 @@ block_cipher = None
 
 # Include i18n and assets for main app
 datas = [
-    ('app/i18n', 'app/i18n'),
+    ('app/i18n', 'i18n'),
     ('assets', 'assets'),
 ]
 
