@@ -1,6 +1,6 @@
 # File Renamer / Trình Đổi Tên File
 
-Version: `0.1.9`
+Version: `0.2.2`
 
 A Windows desktop app for batch renaming files with live preview, undo support, video resolution naming, and update checks through GitHub Releases.
 
@@ -84,7 +84,7 @@ Before publishing a new release:
 2. Rebuild with PyInstaller.
 3. Rebuild the installer with `installer/build-installer.ps1`.
 4. Push the updated app files and installer to the public release repository.
-5. Create a GitHub Release with a tag newer than the app version users already have, for example `v0.1.9`.
+5. Create a GitHub Release with a tag newer than the app version users already have, for example `v0.2.2`.
 6. Attach `dist/FileRenamer-Setup.exe` to the GitHub Release so users can install the latest version.
 
 ### Project Structure
@@ -190,7 +190,7 @@ Trước khi phát hành bản mới:
 2. Build lại bằng PyInstaller.
 3. Build lại installer bằng `installer/build-installer.ps1`.
 4. Push các file app và installer đã cập nhật lên repo release public.
-5. Tạo GitHub Release với tag mới hơn bản người dùng đang có, ví dụ `v0.1.9`.
+5. Tạo GitHub Release với tag mới hơn bản người dùng đang có, ví dụ `v0.2.2`.
 6. Đính kèm `dist/FileRenamer-Setup.exe` vào GitHub Release để người dùng cài bản mới nhất.
 
 ### Cấu trúc project
