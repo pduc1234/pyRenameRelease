@@ -25,7 +25,17 @@ namespace FileRenamerInstaller
                 return Uninstall(args);
             }
 
-            return Install();
+            bool silent = HasArgument(args, "--silent");
+            bool restart = HasArgument(args, "--restart");
+
+            int result = Install(silent);
+            
+            if (result == 0 && restart)
+            {
+                RestartApp();
+            }
+
+            return result;
         }
 
         private static bool IsUninstallMode(string[] args)
@@ -42,7 +52,7 @@ namespace FileRenamerInstaller
             return string.Equals(fileName, UninstallerName, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static int Install()
+        private static int Install(bool silent)
         {
             string tempRoot = Path.Combine(Path.GetTempPath(), AppName + "_Install_" + Guid.NewGuid().ToString("N"));
 
@@ -69,7 +79,14 @@ namespace FileRenamerInstaller
 
                 if (Directory.Exists(installRoot))
                 {
-                    Directory.Delete(installRoot, true);
+                    try {
+                        Directory.Delete(installRoot, true);
+                    } catch {
+                        // If it fails, maybe some file is locked. Updater should have handled this.
+                        // But we try to be robust.
+                        System.Threading.Thread.Sleep(1000);
+                        Directory.Delete(installRoot, true);
+                    }
                 }
 
                 CopyDirectory(payloadRoot, installRoot);
@@ -77,27 +94,46 @@ namespace FileRenamerInstaller
                 CreateUninstaller(installRoot);
                 CreateUninstallRegistryEntry(installRoot);
 
-                MessageBox.Show(
-                    AppName + " installed successfully.\n\nLocation: " + installRoot,
-                    AppName + " Installer",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                if (!silent)
+                {
+                    MessageBox.Show(
+                        AppName + " installed successfully.\n\nLocation: " + installRoot,
+                        AppName + " Installer",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                }
 
                 return 0;
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    "Installation failed:\n\n" + ex.Message,
-                    AppName + " Installer",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                if (!silent)
+                {
+                    MessageBox.Show(
+                        "Installation failed:\n\n" + ex.Message,
+                        AppName + " Installer",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
 
                 return 1;
             }
             finally
             {
                 TryDeleteDirectory(tempRoot);
+            }
+        }
+
+        private static void RestartApp()
+        {
+            string installRoot = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Programs",
+                AppName);
+            string appExe = Path.Combine(installRoot, AppName + ".exe");
+            if (File.Exists(appExe))
+            {
+                Process.Start(appExe);
             }
         }
 
