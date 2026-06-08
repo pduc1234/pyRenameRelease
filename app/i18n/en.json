@@ -66,7 +66,7 @@
   "select_folder_placeholder": "Select a folder...",
   "update_available": "Update available",
   "update_dialog_title": "App Update",
-  "update_dialog_msg": "A new version v{version} is available.\n\nWould you like to open the download page?",
-  "open_download": "Open Download Page",
+  "update_dialog_msg": "A new version v{version} is available.\n\nWould you like to download and install it now?",
+  "open_download": "Download and install",
   "later": "Later"
 }

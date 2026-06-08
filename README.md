@@ -21,7 +21,7 @@ File Renamer la ung dung desktop Windows de doi ten file hang loat an toan. App 
 - Resizable rename controls and preview area.
 - Separate full-size Guide tab for onboarding/new users.
 - English and Vietnamese UI.
-- GitHub Releases update check with signed manifest support and safe fallback.
+- GitHub Releases update check with in-app installer download and optional signed/hash verification.
 - Windows user-level installer with Desktop/Start Menu shortcuts and uninstaller.
 
 ---
@@ -110,8 +110,9 @@ Update behavior:
 1. App starts.
 2. Current `APP_VERSION` is compared with the latest GitHub Release.
 3. If a newer version exists, the top bar shows `Update available`.
-4. If the release includes a signed `latest.json` manifest and package hash, the app can download and verify the package.
-5. If signed update assets are missing, the app still shows the update button and opens the GitHub Release page safely.
+4. If the release includes a signed `latest.json` manifest or GitHub asset digest, the app verifies the package hash.
+5. If the GitHub fallback release has no hash, the app still downloads `FileRenamer-Setup.exe` and launches `FileRenamerUpdater.exe` instead of opening the browser.
+6. `FileRenamerUpdater.exe` can also be run directly; it checks the latest release, downloads the setup package, installs it silently, and can restart the app when launched by the main app.
 
 Preferred release assets:
 
@@ -144,7 +145,10 @@ Example `latest.json`:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\update-button.test.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\update-autoinstall-fallback.test.ps1
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\update-checker-fallback.test.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\updater-direct-mode.test.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\updater-wait.test.ps1
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\i18n-packaged-path.test.ps1
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\installer-uninstall.test.ps1
 .\.venv\Scripts\python.exe -m compileall app

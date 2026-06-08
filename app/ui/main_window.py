@@ -368,7 +368,7 @@ class MainWindow(QMainWindow):
         )
         
         if reply == QMessageBox.Yes:
-            if not self.latest_release.package_url or not self.latest_release.sha256:
+            if not self.latest_release.package_url:
                 webbrowser.open(self.latest_release.notes_url or self.latest_release.package_url)
                 return
 
@@ -385,12 +385,17 @@ class MainWindow(QMainWindow):
                     progress_callback=lambda p: self.status_footer.set_status(f"Downloading: {p}%")
                 )
                 
-                # 2. Verify hash
-                self.status_footer.set_status("Verifying update...")
-                if not verify_sha256(package_path, self.latest_release.sha256):
-                    QMessageBox.critical(self, "Update Error", "Update package verification failed (hash mismatch).")
-                    self.update_downloader.cleanup()
-                    return
+                # 2. Verify hash when the release provides one. GitHub API
+                # fallback releases may not expose a digest, but they can still
+                # be installed through the updater instead of opening a browser.
+                if self.latest_release.sha256:
+                    self.status_footer.set_status("Verifying update...")
+                    if not verify_sha256(package_path, self.latest_release.sha256):
+                        QMessageBox.critical(self, "Update Error", "Update package verification failed (hash mismatch).")
+                        self.update_downloader.cleanup()
+                        return
+                else:
+                    self.status_footer.set_status("Installing update without release hash...")
                 
                 # 3. Launch updater
                 self.status_footer.set_status("Launching updater...")
