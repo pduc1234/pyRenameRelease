@@ -100,26 +100,48 @@ class MainWindow(QMainWindow):
         # Right Content
         right_widget = QWidget()
         right_layout = QVBoxLayout(right_widget)
-        right_layout.setContentsMargins(5, 5, 5, 5)
-        right_layout.setSpacing(10)
+        right_layout.setContentsMargins(0, 0, 0, 0)
+        right_layout.setSpacing(0)
 
-        # Tabs
-        self.tabs = QTabWidget()
+        # Mode Tabs (Rename vs Guide)
+        self.mode_tabs = QTabWidget()
+        
+        # Rename Mode Content
+        rename_content = QWidget()
+        rename_layout = QVBoxLayout(rename_content)
+        rename_layout.setContentsMargins(5, 5, 5, 5)
+        rename_layout.setSpacing(5)
+
+        self.rename_splitter = QSplitter(Qt.Vertical)
+
+        # Function Tabs
+        self.rename_tabs = QTabWidget()
         self.seq_tab = SequentialTab(self.i18n)
         self.suffix_tab = AddSuffixTab(self.i18n)
         self.video_tab = VideoFormatTab(self.i18n)
-        self.guide_tab = GuideTab(self.i18n)
 
-        self.tabs.addTab(self.seq_tab, "Sequential")
-        self.tabs.addTab(self.suffix_tab, "Add Suffix")
-        self.tabs.addTab(self.video_tab, "Video Format")
-        self.tabs.addTab(self.guide_tab, "Guide")
+        self.rename_tabs.addTab(self.seq_tab, "Sequential")
+        self.rename_tabs.addTab(self.suffix_tab, "Add Suffix")
+        self.rename_tabs.addTab(self.video_tab, "Video Format")
         
-        right_layout.addWidget(self.tabs, 0) # Fixed height tab area roughly
+        self.rename_splitter.addWidget(self.rename_tabs)
 
         # Preview Table
         self.preview_table = PreviewTable(self.i18n)
-        right_layout.addWidget(self.preview_table, 1)
+        self.rename_splitter.addWidget(self.preview_table)
+        
+        # Initial sizes for vertical splitter [tabs, preview]
+        self.rename_splitter.setSizes([280, 420])
+        
+        rename_layout.addWidget(self.rename_splitter)
+        
+        # Guide Tab
+        self.guide_tab = GuideTab(self.i18n)
+
+        self.mode_tabs.addTab(rename_content, "Rename")
+        self.mode_tabs.addTab(self.guide_tab, "Guide")
+        
+        right_layout.addWidget(self.mode_tabs)
 
         self.splitter.addWidget(right_widget)
         self.splitter.setStretchFactor(1, 1)
@@ -147,7 +169,8 @@ class MainWindow(QMainWindow):
         self.seq_tab.options_changed.connect(self._update_preview)
         self.suffix_tab.options_changed.connect(self._update_preview)
         self.video_tab.options_changed.connect(self._update_preview)
-        self.tabs.currentChanged.connect(self._update_preview)
+        self.rename_tabs.currentChanged.connect(self._update_preview)
+        self.mode_tabs.currentChanged.connect(self._update_preview)
 
         # Footer
         self.status_footer.rename_requested.connect(self._on_rename)
@@ -194,12 +217,17 @@ class MainWindow(QMainWindow):
         return [f for f in self.display_files if f.path in self.sidebar.selected_file_paths]
 
     def _update_preview(self):
+        # If in Guide mode, clear preview and return
+        if self.mode_tabs.currentIndex() == 1:
+            self.preview_table.update_pairs([])
+            return
+
         targets = self._get_target_files()
         if not targets:
             self.preview_table.update_pairs([])
             return
 
-        current_tab_idx = self.tabs.currentIndex()
+        current_tab_idx = self.rename_tabs.currentIndex()
         pairs = []
         
         try:
@@ -220,9 +248,6 @@ class MainWindow(QMainWindow):
                     auto_detect=opt["auto_detect"], manual_res=opt["manual_res"],
                     prefix=opt["prefix"]
                 )
-            else: # Guide
-                self.preview_table.update_pairs([])
-                return
         except Exception as e:
             # Fallback error
             self.status_footer.set_status(self.i18n.tr("preview_error", message=str(e)))
@@ -235,11 +260,14 @@ class MainWindow(QMainWindow):
         self.status_footer.set_rename_enabled(not has_errors and len(pairs) > 0)
 
     def _on_rename(self):
+        if self.mode_tabs.currentIndex() == 1: # Guide mode
+            return
+
         targets = self._get_target_files()
         if not targets:
             return
 
-        current_tab_idx = self.tabs.currentIndex()
+        current_tab_idx = self.rename_tabs.currentIndex()
         pairs = []
         
         if current_tab_idx == 0:
@@ -360,10 +388,12 @@ class MainWindow(QMainWindow):
         self.guide_tab.update_translations()
         
         # Update tab texts
-        self.tabs.setTabText(0, self.i18n.tr("sequential"))
-        self.tabs.setTabText(1, self.i18n.tr("suffix"))
-        self.tabs.setTabText(2, self.i18n.tr("video"))
-        self.tabs.setTabText(3, self.i18n.tr("guide"))
+        self.rename_tabs.setTabText(0, self.i18n.tr("sequential"))
+        self.rename_tabs.setTabText(1, self.i18n.tr("suffix"))
+        self.rename_tabs.setTabText(2, self.i18n.tr("video"))
+        
+        self.mode_tabs.setTabText(0, self.i18n.tr("rename"))
+        self.mode_tabs.setTabText(1, self.i18n.tr("guide"))
         
         # Re-trigger status update
         self._on_selection_changed()

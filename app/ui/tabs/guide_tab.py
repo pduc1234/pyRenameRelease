@@ -12,7 +12,9 @@ class GuideTab(QWidget):
 
     def _create_layout(self):
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(16, 16, 16, 16)
         self.browser = QTextBrowser()
+        self.browser.setOpenExternalLinks(True)
         layout.addWidget(self.browser)
         self.update_translations()
 

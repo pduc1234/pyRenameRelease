@@ -3,6 +3,7 @@ from PySide6.QtWidgets import (
     QWidget, QHBoxLayout, QLabel, QLineEdit, QPushButton, QComboBox, QFileDialog
 )
 from PySide6.QtCore import Qt, Signal
+from pathlib import Path
 
 
 class TopBar(QWidget):
@@ -29,8 +30,9 @@ class TopBar(QWidget):
 
         # Folder path input
         self.folder_input = QLineEdit()
-        self.folder_input.setReadOnly(True)
         self.folder_input.setPlaceholderText("Select a folder...")
+        self.folder_input.returnPressed.connect(self._on_input_changed)
+        self.folder_input.editingFinished.connect(self._on_input_changed)
         layout.addWidget(self.folder_input, 1)
 
         # Browse button
@@ -74,6 +76,25 @@ class TopBar(QWidget):
 
     def _on_lang_change(self, text):
         self.language_changed.emit(text.lower())
+
+    def _on_input_changed(self):
+        path_str = self.folder_input.text().strip()
+        if not path_str:
+            return
+            
+        # Trim quotes if user paste "D:\path"
+        if path_str.startswith('"') and path_str.endswith('"'):
+            path_str = path_str[1:-1]
+        elif path_str.startswith("'") and path_str.endswith("'"):
+            path_str = path_str[1:-1]
+            
+        path = Path(path_str)
+        if path.is_dir():
+            # Standardize path string
+            path_str = str(path)
+            if path_str != self.folder_input.text():
+                self.folder_input.setText(path_str)
+            self.folder_changed.emit(path_str)
 
     def update_translations(self):
         """Refresh labels based on current language."""
