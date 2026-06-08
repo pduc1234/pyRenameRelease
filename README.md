@@ -1,32 +1,32 @@
-# File Renamer / Trình Đổi Tên File
+# File Renamer / Trinh Doi Ten File
 
-Version: `0.2.2`
+Version: `0.2.4`
 
-A Windows desktop app for batch renaming files with live preview, undo support, video resolution naming, and update checks through GitHub Releases.
+File Renamer is a Windows desktop app for safely renaming many files at once. It supports live preview, undo, video-resolution naming, bilingual UI, a Windows installer, and GitHub Releases based update checks.
 
-Ứng dụng desktop Windows để đổi tên file hàng loạt, có xem trước, hoàn tác, đổi tên theo độ phân giải video và kiểm tra cập nhật qua GitHub Releases.
+File Renamer la ung dung desktop Windows de doi ten file hang loat an toan. App co xem truoc, hoan tac, doi ten theo do phan giai video, giao dien Anh/Viet, installer Windows va co che kiem tra cap nhat qua GitHub Releases.
 
 ---
 
-## English
+## Highlights
 
-### Features
+- Batch rename files with validation before applying changes.
+- Sequential numbering with prefix, zero padding, and custom pattern.
+- Add suffix mode with configurable separator.
+- Video format mode with `{n}`, `{res}`, and `{name}` variables.
+- Optional video prefix helper for names such as `FFF_1 - 1920x1080.mp4`.
+- Live preview table with old name, new name, and status.
+- Undo for the latest successful rename operation.
+- Folder selection by Browse, drag and drop, or pasted path.
+- Resizable rename controls and preview area.
+- Separate full-size Guide tab for onboarding/new users.
+- English and Vietnamese UI.
+- GitHub Releases update check with signed manifest support and safe fallback.
+- Windows user-level installer with Desktop/Start Menu shortcuts and uninstaller.
 
-- **Sequential rename**: rename selected files with numbering, prefix, padding, and a custom pattern.
-- **Add suffix**: append text to existing filenames with a configurable separator.
-- **Video format rename**: rename videos using `{n}`, `{res}`, and `{name}` variables.
-- **Optional video prefix**: enable `Use prefix` to generate names like `FFF_1 - 1920x1080.mp4`.
-- **Resolution source**: auto-detect video resolution by default, with manual override available.
-- **Precise file selection**: no auto-select on folder load, plus All/None/Invert and Shift + click range selection.
-- **Live preview**: see old name, new name, and validation status before renaming.
-- **Safe rename flow**: confirmation for large batches, validation for Windows filenames, and rollback on failure.
-- **Undo**: revert the latest successful rename operation for the current folder.
-- **Drag and drop**: drop a folder into the app to load it.
-- **Multilingual UI**: English and Vietnamese.
-- **Update check**: checks public GitHub Releases for newer versions.
-- **Windows installer**: `FileRenamer-Setup.exe` installs the app for the current user, creates Desktop/Start Menu shortcuts, and adds `Uninstall FileRenamer.exe`.
+---
 
-### Run From Source
+## Run From Source
 
 Requirements:
 
@@ -34,186 +34,172 @@ Requirements:
 - Python 3.10+
 
 ```powershell
-pip install -r requirements.txt
-python main.py
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe main.py
 ```
 
-### Build Executable and Installer
+---
+
+## Build
+
+Build the packaged app:
 
 ```powershell
-pip install -r requirements.txt
-pyinstaller build.spec --clean -y
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\installer\build-installer.ps1
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\pyinstaller.exe build.spec --clean -y
 ```
 
-The packaged app is created at:
+Output:
 
 ```text
 dist/FileRenamer/FileRenamer.exe
+dist/FileRenamer/FileRenamerUpdater.exe
 ```
 
-The installer is created at:
+Build the Windows installer:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\installer\build-installer.ps1
+```
+
+Output:
 
 ```text
 dist/FileRenamer-Setup.exe
 ```
 
-When installed, FileRenamer is copied to:
+---
+
+## Install And Uninstall
+
+`FileRenamer-Setup.exe` installs the app for the current Windows user.
+
+Install location:
 
 ```text
 %LOCALAPPDATA%\Programs\FileRenamer
 ```
 
-The installer creates Desktop and Start Menu shortcuts, writes a per-user uninstall entry to Windows Installed Apps, and places the uninstaller at:
+The installer creates:
 
-```text
-%LOCALAPPDATA%\Programs\FileRenamer\Uninstall FileRenamer.exe
-```
+- `FileRenamer.exe`
+- `FileRenamerUpdater.exe`
+- `Uninstall FileRenamer.exe`
+- Desktop shortcut
+- Start Menu shortcut
+- Windows Installed Apps uninstall entry under HKCU
 
-### Update Releases
+Uninstall options:
 
-The app checks releases from:
+- Run `%LOCALAPPDATA%\Programs\FileRenamer\Uninstall FileRenamer.exe`
+- Or uninstall from Windows Settings > Installed apps
+
+---
+
+## Updates
+
+The app checks:
 
 ```text
 https://github.com/pduc1234/pyRenameRelease
 ```
 
-Before publishing a new release:
+Update behavior:
+
+1. App starts.
+2. Current `APP_VERSION` is compared with the latest GitHub Release.
+3. If a newer version exists, the top bar shows `Update available`.
+4. If the release includes a signed `latest.json` manifest and package hash, the app can download and verify the package.
+5. If signed update assets are missing, the app still shows the update button and opens the GitHub Release page safely.
+
+Preferred release assets:
+
+```text
+FileRenamer-Setup.exe
+latest.json
+latest.json.sig
+```
+
+Example `latest.json`:
+
+```json
+{
+  "version": "0.2.4",
+  "published_at": "2026-06-08T00:00:00Z",
+  "package_url": "https://github.com/pduc1234/pyRenameRelease/releases/download/v0.2.4/FileRenamer-Setup.exe",
+  "sha256": "<sha256 of FileRenamer-Setup.exe>",
+  "signature_algorithm": "ed25519",
+  "notes_url": "https://github.com/pduc1234/pyRenameRelease/releases/tag/v0.2.4"
+}
+```
+
+---
+
+## Release Checklist
 
 1. Update `APP_VERSION` in `app/app_info.py`.
-2. Rebuild with PyInstaller.
-3. Rebuild the installer with `installer/build-installer.ps1`.
-4. Push the updated app files and installer to the public release repository.
-5. Create a GitHub Release with a tag newer than the app version users already have, for example `v0.2.2`.
-6. Attach `dist/FileRenamer-Setup.exe` to the GitHub Release so users can install the latest version.
+2. Update this README version and release examples.
+3. Run tests:
 
-### Project Structure
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\update-button.test.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\update-checker-fallback.test.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\i18n-packaged-path.test.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\tests\installer-uninstall.test.ps1
+.\.venv\Scripts\python.exe -m compileall app
+```
+
+4. Build app and installer:
+
+```powershell
+.\.venv\Scripts\pyinstaller.exe build.spec --clean -y
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\installer\build-installer.ps1
+```
+
+5. Commit and tag:
+
+```powershell
+git add README.md app/app_info.py app tests installer build.spec requirements.txt
+git add -f dist/FileRenamer dist/FileRenamer-Setup.exe
+git commit -m "v0.2.4: release build"
+git tag v0.2.4
+git push origin main
+git push origin v0.2.4
+```
+
+6. Create a GitHub Release from tag `v0.2.4`.
+7. Attach `dist/FileRenamer-Setup.exe`.
+8. Optional but recommended: attach signed `latest.json` and `latest.json.sig`.
+
+---
+
+## Project Structure
 
 ```text
 app/
-  app_info.py              App version and public release repository
-  core/                    File scanning, preview generation, rename, undo, update check
+  app_info.py              App version and GitHub release repository
+  core/                    File scanning, preview, rename, undo, update logic
   i18n/                    English and Vietnamese translations
-  ui/                      PySide6 windows, widgets, and tabs
-assets/                    App icons and images
+  ui/                      PySide6 UI windows, widgets, and tabs
+  updater/                 Standalone updater entry point
+assets/                    App icon and visual assets
 dist/FileRenamer/          Packaged Windows app
 dist/FileRenamer-Setup.exe Windows installer artifact
 installer/                 Installer build script and C# installer stub
+tests/                     PowerShell regression checks
 main.py                    App entry point
 build.spec                 PyInstaller configuration
 requirements.txt           Runtime/build dependencies
 ```
 
-### Tech Stack
-
-- UI: PySide6
-- Video metadata: pymediainfo
-- Packaging: PyInstaller
-- Installer: C#/.NET Framework self-extracting installer
-- Updates: GitHub Releases API
-
 ---
 
-## Tiếng Việt
-
-### Tính năng
-
-- **Đánh số file**: đổi tên các file đã chọn theo số thứ tự, tiền tố, số chữ số và mẫu tên tùy chỉnh.
-- **Thêm hậu tố**: thêm chuỗi vào cuối tên file hiện tại với dấu ngăn cách tùy chọn.
-- **Định dạng video**: đổi tên video bằng các biến `{n}`, `{res}`, `{name}`.
-- **Tiền tố video tùy chọn**: bật `Sử dụng tiền tố` để tạo tên như `FFF_1 - 1920x1080.mp4`.
-- **Nguồn độ phân giải**: mặc định tự động đọc độ phân giải video, vẫn có thể nhập thủ công.
-- **Chọn file chính xác**: không tự chọn tất cả khi mở thư mục; hỗ trợ Tất cả/Bỏ chọn/Đảo chọn và Shift + click để chọn theo vùng.
-- **Xem trước trực tiếp**: xem tên cũ, tên mới và trạng thái kiểm tra trước khi đổi tên.
-- **Đổi tên an toàn**: xác nhận khi đổi tên nhiều file, kiểm tra tên hợp lệ trên Windows và rollback nếu lỗi.
-- **Hoàn tác**: khôi phục lần đổi tên thành công gần nhất trong thư mục hiện tại.
-- **Kéo thả thư mục**: kéo một thư mục vào app để tải danh sách file.
-- **Giao diện song ngữ**: tiếng Anh và tiếng Việt.
-- **Kiểm tra cập nhật**: kiểm tra bản mới qua GitHub Releases public.
-- **Installer Windows**: `FileRenamer-Setup.exe` cài app cho user hiện tại, tạo shortcut Desktop/Start Menu và thêm `Uninstall FileRenamer.exe`.
-
-### Chạy từ source
-
-Yêu cầu:
-
-- Windows
-- Python 3.10+
-
-```powershell
-pip install -r requirements.txt
-python main.py
-```
-
-### Build file chạy và installer
-
-```powershell
-pip install -r requirements.txt
-pyinstaller build.spec --clean -y
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\installer\build-installer.ps1
-```
-
-Ứng dụng đã đóng gói nằm tại:
-
-```text
-dist/FileRenamer/FileRenamer.exe
-```
-
-Installer được tạo tại:
-
-```text
-dist/FileRenamer-Setup.exe
-```
-
-Sau khi cài đặt, FileRenamer được copy vào:
-
-```text
-%LOCALAPPDATA%\Programs\FileRenamer
-```
-
-Installer tạo shortcut ở Desktop và Start Menu, đăng ký mục gỡ cài đặt theo user trong Windows Installed Apps, và đặt file uninstall tại:
-
-```text
-%LOCALAPPDATA%\Programs\FileRenamer\Uninstall FileRenamer.exe
-```
-
-### Cập nhật phiên bản
-
-App kiểm tra release tại:
-
-```text
-https://github.com/pduc1234/pyRenameRelease
-```
-
-Trước khi phát hành bản mới:
-
-1. Cập nhật `APP_VERSION` trong `app/app_info.py`.
-2. Build lại bằng PyInstaller.
-3. Build lại installer bằng `installer/build-installer.ps1`.
-4. Push các file app và installer đã cập nhật lên repo release public.
-5. Tạo GitHub Release với tag mới hơn bản người dùng đang có, ví dụ `v0.2.2`.
-6. Đính kèm `dist/FileRenamer-Setup.exe` vào GitHub Release để người dùng cài bản mới nhất.
-
-### Cấu trúc project
-
-```text
-app/
-  app_info.py              Version app và repo release public
-  core/                    Quét file, tạo preview, đổi tên, hoàn tác, kiểm tra cập nhật
-  i18n/                    Bản dịch tiếng Anh và tiếng Việt
-  ui/                      Cửa sổ, widget và tab PySide6
-assets/                    Icon và hình ảnh của app
-dist/FileRenamer/          Bản app Windows đã đóng gói
-dist/FileRenamer-Setup.exe File installer Windows
-installer/                 Script build installer và C# installer stub
-main.py                    Entry point của app
-build.spec                 Cấu hình PyInstaller
-requirements.txt           Dependency chạy/build app
-```
-
-### Công nghệ
+## Tech Stack
 
 - UI: PySide6
-- Metadata video: pymediainfo
-- Đóng gói: PyInstaller
+- Packaging: PyInstaller
 - Installer: C#/.NET Framework self-extracting installer
-- Cập nhật: GitHub Releases API
+- Updates: GitHub Releases API, SHA-256, Ed25519 manifest verification
+- Video metadata: pymediainfo
+- Updater helper: psutil

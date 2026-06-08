@@ -368,6 +368,10 @@ class MainWindow(QMainWindow):
         )
         
         if reply == QMessageBox.Yes:
+            if not self.latest_release.package_url or not self.latest_release.sha256:
+                webbrowser.open(self.latest_release.notes_url or self.latest_release.package_url)
+                return
+
             # 1. Start download
             self.status_footer.set_status(f"Downloading update v{version}...")
             self.top_bar.show_update_button(False)
